@@ -1,16 +1,25 @@
 package com.bilyoner.demo;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import org.assertj.core.api.ListAssert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class DocumentResourceTest {
+public class DocumentResourceIT {
+    @Autowired
+    MongoTemplate mongoTemplate;
 
     @LocalServerPort
     private int port;
@@ -18,8 +27,20 @@ public class DocumentResourceTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @BeforeEach
+    public void clearDataBase() {
+    }
+
     @Test
-    public void scenario() throws Exception {
+    public void duplicateDocument() throws Exception {
+        var response = createDocumentWithNumber(25);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var response2 = createDocumentWithNumber(25);
+        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
+    public void minAndMax() throws Exception {
         thereIsNoMinimumDocument();
         thereIsNoMaximumDocument();
 
@@ -48,12 +69,45 @@ public class DocumentResourceTest {
         thereIsNoMaximumDocument();
     }
 
+    @Test
+    public void order() throws Exception {
+        createDocumentWithNumber(25);
+        createDocumentWithNumber(5);
+        createDocumentWithNumber(15);
+
+        Document[] ascending = getDocumentsAscending();
+        numbersOf(ascending).containsExactly(5, 15, 25);
+
+        Document[] descending = getDocumentsDescending();
+        numbersOf(descending).containsExactly(25, 15, 5);
+
+        Document[] defaultOrder = getDocumentsDefaultOrder();
+        numbersOf(defaultOrder).containsExactly(5, 15, 25);
+
+    }
+
+    private ListAssert<Integer> numbersOf(Document[] ascending) {
+        return assertThat(Arrays.stream(ascending).map(Document::getNumber));
+    }
+
+    private Document[] getDocumentsDescending() {
+        return this.restTemplate.getForObject(getEndPoint() + "?descending=true", Document[].class);
+    }
+
+    private Document[] getDocumentsAscending() {
+        return this.restTemplate.getForObject(getEndPoint() + "?descending=false", Document[].class);
+    }
+
+    private Document[] getDocumentsDefaultOrder() {
+        return this.restTemplate.getForObject(getEndPoint(), Document[].class);
+    }
+
     private void deleteDocumentWithNumber(int documentNumber) {
         delete("/{number}", documentNumber);
     }
 
-    private void createDocumentWithNumber(int documentNumber) {
-        post("", documentWithNumber(documentNumber));
+    private ResponseEntity<Document> createDocumentWithNumber(int documentNumber) {
+        return post("", documentWithNumber(documentNumber));
     }
 
     private void thereIsNoMinimumDocument() {
@@ -98,8 +152,8 @@ public class DocumentResourceTest {
         this.restTemplate.delete(getEndPoint() + url, number);
     }
 
-    private Document post(String url, Document document) {
-        return this.restTemplate.postForObject(getEndPoint() + url, document, Document.class);
+    private ResponseEntity<Document> post(String url, Document document) {
+        return this.restTemplate.postForEntity(getEndPoint() + url, document, Document.class);
     }
 
     String getEndPoint() {

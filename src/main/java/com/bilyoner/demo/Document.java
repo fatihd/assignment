@@ -2,7 +2,11 @@ package com.bilyoner.demo;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -17,5 +21,6 @@ public class Document {
     @Indexed(unique = true)
     int number;
 
-    LocalDateTime insertedAt;
+    @Field("inserted_at")
+    String insertedAt;
 }
