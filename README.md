@@ -21,7 +21,7 @@ Run as an ordinary spring boot app,
 overriding default config as necessary.
 e.g. specifying mongodb
     
-    $JAVA_HOME/bin/java -jar .\target\demo-0.0.1-SNAPSHOT.jar --spring.data.mongodb.host=192.168.99.100   
+    $JAVA_HOME/bin/java -jar ./target/demo-0.0.1-SNAPSHOT.jar --spring.data.mongodb.host=192.168.99.100   
 
 ### Coverage
 Generate JaCoCo report
