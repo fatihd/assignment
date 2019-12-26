@@ -1,14 +1,14 @@
 # assignment
 
-##How to build
+## How to build
 
-##How to build with docker
+## How to build with docker
 
     docker-compose build
     docker-compose up
 
 
-###How to build without docker
+### How to build without docker
 Make sure maven uses JDK 13  (adapt w.r.t. platform) 
 
     $env:JAVA_HOME = "C:\Projects\jdk-13.0.1"
@@ -23,7 +23,7 @@ e.g. specifying mongodb
     
     $JAVA_HOME/bin/java -jar .\target\demo-0.0.1-SNAPSHOT.jar --spring.data.mongodb.host=192.168.99.100   
 
-###Coverage
+### Coverage
 Generate JaCoCo report
 
     mvnw clean verify
