@@ -1,5 +1,7 @@
 package com.bilyoner.demo;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +19,7 @@ import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class DocumentResourceIT {
+public class DocumentResourceTest {
     @Autowired
     MongoTemplate mongoTemplate;
 
@@ -29,7 +31,13 @@ public class DocumentResourceIT {
 
     @BeforeEach
     public void clearDataBase() {
+        for (String collectionName : mongoTemplate.getCollectionNames()) {
+            if (!collectionName.startsWith("system.")) {
+                mongoTemplate.getCollection(collectionName).deleteMany(new BasicDBObject());
+            }
+        }
     }
+
 
     @Test
     public void duplicateDocument() throws Exception {

@@ -1,18 +1,15 @@
 package com.bilyoner.demo;
 
-import java.time.LocalDateTime;
-
-import org.springframework.data.annotation.CreatedDate;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.experimental.FieldDefaults;
 
 @org.springframework.data.mongodb.core.mapping.Document
-@Data
+@Getter
+@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Document {
 
